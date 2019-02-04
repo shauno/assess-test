@@ -12,6 +12,8 @@
 - Insert seed data \
 `docker-compose exec app php vendor/bin/phinx seed:run`
 
+- Open [http://127.0.0.1:8080](http://127.0.0.1:8080) in your browser
+
 ## Idea
 
 _Obviously we would need to create a new repo from this to remove the commit history and this description. I'm just hosting this here to get feedback for the time being_
