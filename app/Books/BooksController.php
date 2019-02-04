@@ -8,9 +8,9 @@ use Slim\Views\PhpRenderer;
 
 class BooksController
 {
-    public function __construct(PhpRenderer $renderer)
+    public function __construct()
     {
-        $this->renderer = $renderer;
+        $this->renderer = new PhpRenderer('../app/');
     }
 
     public function index(Request $request, Response $response)
