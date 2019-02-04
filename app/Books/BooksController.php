@@ -18,15 +18,13 @@ class BooksController
      */
     protected $db;
 
-    public function __construct()
-    {
-        $this->renderer = new PhpRenderer('../app/');
-        $this->db = new \PDO('mysql:host=database;dbname=assess_db', 'root', 'secret');
-        $this->db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
-    }
-
     public function index(Request $request, Response $response)
     {
+        $this->renderer = new PhpRenderer('../app/');
+
+        $this->db = new \PDO('mysql:host=database;dbname=assess_db', 'root', 'secret');
+        $this->db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+
         $books = $this->db->query('SELECT * FROM books')
             ->fetchAll();
 
@@ -38,6 +36,11 @@ class BooksController
 
     public function create(Request $request, Response $response)
     {
+        $this->renderer = new PhpRenderer('../app/');
+
+        $this->db = new \PDO('mysql:host=database;dbname=assess_db', 'root', 'secret');
+        $this->db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+
         // Check if form data has been sent
         if ($params = $request->getQueryParams()) {
             // Create the new book
