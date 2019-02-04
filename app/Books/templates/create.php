@@ -22,6 +22,11 @@
         </tr>
 
         <tr>
+            <td>Price (ZAR)</td>
+            <td><input type="text" name="price[zar]" /></td>
+        </tr>
+
+        <tr>
             <td colspan="2" align="right">
                 <input type="submit" value="Create" />
             </td>

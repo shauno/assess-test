@@ -41,8 +41,12 @@ class BooksController
         // Check if form data has been sent
         if ($params = $request->getQueryParams()) {
             // Create the new book
-            $data = $params['data'];
-            $this->db->exec('INSERT INTO books (title, author_id) VALUES ("'.$data['title'].'", "'.$data['author_id'].'")');
+            $this->db->exec('INSERT INTO books (title, author_id) VALUES ("'.$params['data']['title'].'", "'.$params['data']['author_id'].'")');
+            $book_id = $this->db->lastInsertId();
+
+            // Create the ZAR price for the book
+            $zar = $this->db->query('SELECT * FROM currencies WHERE iso = "ZAR"')->fetch();
+            $this->db->exec('INSERT INTO book_pricing (book_id, currency_id, price) VALUES ('.$book_id.', '.$zar['id'].', '.$params['price']['zar'].')');
 
             // Redirect back to book listing
             return $response->withStatus(302)->withHeader('Location', '/books');
