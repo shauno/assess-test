@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  nginx:
+    build:
+      context: ./docker/nginx/
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    ports:
+      - 8080:80
+  app:
+    build:
+      context: ./docker/app/
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+  database:
+    image: mysql:5.7
+    volumes:
+      - assess_db:/var/lib/mysql
+    environment:
+      - "MYSQL_DATABASE=assess_db"
+      - "MYSQL_ROOT_PASSWORD=secret"
+    ports:
+      - 33066:3306
+volumes:
+  assess_db:
