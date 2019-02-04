@@ -5,6 +5,13 @@ use Phinx\Seed\AbstractSeed;
 
 class BookSeeder extends AbstractSeed
 {
+    public function getDependencies()
+    {
+        return [
+            'AuthorSeeder',
+        ];
+    }
+
     /**
      * Run Method.
      *
