@@ -20,3 +20,5 @@
         </tr>
     <?php endforeach; ?>
 </table>
+
+<a href="/books/create">Create New Book</a>

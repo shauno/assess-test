@@ -35,4 +35,24 @@ class BooksController
             'db' => $this->db,
         ]);
     }
+
+    public function create(Request $request, Response $response)
+    {
+        // Check if form data has been sent
+        if ($params = $request->getQueryParams()) {
+            // Create the new book
+            $data = $params['data'];
+            $this->db->exec('INSERT INTO books (title, author_id) VALUES ("'.$data['title'].'", "'.$data['author_id'].'")');
+
+            // Redirect back to book listing
+            return $response->withStatus(302)->withHeader('Location', '/books');
+        }
+
+        $authors = $this->db->query('SELECT * FROM authors')
+            ->fetchAll();
+
+        return $this->renderer->render($response, 'Books/templates/create.php', [
+            'authors' => $authors,
+        ]);
+    }
 }
