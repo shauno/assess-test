@@ -8,57 +8,47 @@ use Slim\Views\PhpRenderer;
 
 class BooksController
 {
-    /**
-     * @var PhpRenderer
-     */
-    protected $renderer;
-
-    /**
-     * @var \PDO
-     */
-    protected $db;
-
     public function index(Request $request, Response $response)
     {
-        $this->renderer = new PhpRenderer('../app/');
+        $renderer = new PhpRenderer('../app/');
 
-        $this->db = new \PDO('mysql:host=database;dbname=assess_db', 'root', 'secret');
-        $this->db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+        $db = new \PDO('mysql:host=database;dbname=assess_db', 'root', 'secret');
+        $db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 
-        $books = $this->db->query('SELECT * FROM books')
+        $books = $db->query('SELECT * FROM books')
             ->fetchAll();
 
-        return $this->renderer->render($response, 'Books/templates/list.php', [
+        return $renderer->render($response, 'Books/templates/list.php', [
             'books' => $books,
-            'db' => $this->db,
+            'db' => $db,
         ]);
     }
 
     public function create(Request $request, Response $response)
     {
-        $this->renderer = new PhpRenderer('../app/');
+        $renderer = new PhpRenderer('../app/');
 
-        $this->db = new \PDO('mysql:host=database;dbname=assess_db', 'root', 'secret');
-        $this->db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+        $db = new \PDO('mysql:host=database;dbname=assess_db', 'root', 'secret');
+        $db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 
         // Check if form data has been sent
         if ($params = $request->getQueryParams()) {
             // Create the new book
-            $this->db->exec('INSERT INTO books (title, author_id) VALUES ("'.$params['data']['title'].'", "'.$params['data']['author_id'].'")');
-            $book_id = $this->db->lastInsertId();
+            $db->exec('INSERT INTO books (title, author_id) VALUES ("'.$params['data']['title'].'", "'.$params['data']['author_id'].'")');
+            $book_id = $db->lastInsertId();
 
             // Create the ZAR price for the book
-            $zar = $this->db->query('SELECT * FROM currencies WHERE iso = "ZAR"')->fetch();
-            $this->db->exec('INSERT INTO book_pricing (book_id, currency_id, price) VALUES ('.$book_id.', '.$zar['id'].', '.$params['price']['zar'].')');
+            $zar = $db->query('SELECT * FROM currencies WHERE iso = "ZAR"')->fetch();
+            $db->exec('INSERT INTO book_pricing (book_id, currency_id, price) VALUES ('.$book_id.', '.$zar['id'].', '.$params['price']['zar'].')');
 
             // Redirect back to book listing
             return $response->withStatus(302)->withHeader('Location', '/books');
         }
 
-        $authors = $this->db->query('SELECT * FROM authors')
+        $authors = $db->query('SELECT * FROM authors')
             ->fetchAll();
 
-        return $this->renderer->render($response, 'Books/templates/create.php', [
+        return $renderer->render($response, 'Books/templates/create.php', [
             'authors' => $authors,
         ]);
     }
