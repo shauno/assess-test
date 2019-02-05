@@ -1,6 +1,6 @@
 <?php
 
-namespace Mukuru\Books;
+namespace App\Books;
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
@@ -12,15 +12,30 @@ class BooksController
     {
         $renderer = new PhpRenderer('../app/');
 
-        $db = new \PDO('mysql:host=database;dbname=assess_db', 'root', 'secret');
-        $db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+        // The host "nginx" uses docker's internal DNS to resolve to the web server
+        // Get all the books to show
+        $ch = curl_init('http://nginx/api/books');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $books = json_decode(curl_exec($ch));
+        curl_close($ch);
 
-        $books = $db->query('SELECT * FROM books')
-            ->fetchAll();
+        // Get all the authors
+        $ch = curl_init('http://nginx/api/authors');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $authors = json_decode(curl_exec($ch));
+        curl_close($ch);
+
+        // Loop through all books and add the author to each one for use in the listing template
+        foreach ($books as $key => $book) {
+            foreach ($authors as $author) {
+                if ($book->author_id == $author->id) {
+                    $books[$key]->author = $author;
+                }
+            }
+        }
 
         return $renderer->render($response, 'Books/templates/list.php', [
             'books' => $books,
-            'db' => $db,
         ]);
     }
 
@@ -33,20 +48,22 @@ class BooksController
 
         // Check if form data has been sent
         if ($params = $request->getQueryParams()) {
-            // Create the new book
-            $db->exec('INSERT INTO books (title, author_id) VALUES ("'.$params['data']['title'].'", "'.$params['data']['author_id'].'")');
-            $book_id = $db->lastInsertId();
 
-            // Create the ZAR price for the book
-            $zar = $db->query('SELECT * FROM currencies WHERE iso = "ZAR"')->fetch();
-            $db->exec('INSERT INTO book_pricing (book_id, currency_id, price) VALUES ('.$book_id.', '.$zar['id'].', '.$params['price']['zar'].')');
+            // Make the api call to create the book
+            $ch = curl_init('http://nginx/api/books/create?'.http_build_query($params));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_exec($ch);
+            curl_close($ch);
 
             // Redirect back to book listing
             return $response->withStatus(302)->withHeader('Location', '/books');
         }
 
-        $authors = $db->query('SELECT * FROM authors')
-            ->fetchAll();
+        // Get all the authors
+        $ch = curl_init('http://nginx/api/authors');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $authors = json_decode(curl_exec($ch));
+        curl_close($ch);
 
         return $renderer->render($response, 'Books/templates/create.php', [
             'authors' => $authors,

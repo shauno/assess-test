@@ -8,9 +8,9 @@
         <tr>
             <td>Author</td>
             <td>
-                <select name="data[author_id]">
+                <select name="author_id">
                     <?php foreach ($authors as $author): ?>
-                        <option value="<?= $author['id'] ?>"><?= $author['first_name'] ?> <?= $author['last_name'] ?></option>
+                        <option value="<?= $author->id ?>"><?= $author->first_name ?> <?= $author->last_name ?></option>
                     <?php endforeach; ?>
                 </select>
             </td>
@@ -18,12 +18,12 @@
 
         <tr>
             <td>Title</td>
-            <td><input type="text" name="data[title]" /> </td>
+            <td><input type="text" name="title" /> </td>
         </tr>
 
         <tr>
             <td>Price (ZAR)</td>
-            <td><input type="text" name="price[zar]" /></td>
+            <td><input type="text" name="price[ZAR]" /></td>
         </tr>
 
         <tr>
