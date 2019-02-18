@@ -1,51 +1,46 @@
 ## Quickstart
 
-- Run composer install \
-`docker run --rm --interactive --tty --volume $PWD:/app composer install`
-  
+- Follow the instructions in the `./api/readme.md` and `./app/readme.md` to run service specific setup 
+
+From within this directory
+
 - Bring up the docker containers \
 `docker-compose up --build`
 
-- Run database migrations \
-`docker-compose exec app php vendor/bin/phinx migrate`
+- Browse to http://app.localtest.me:8080/
 
-- Insert seed data \
-`docker-compose exec app php vendor/bin/phinx seed:run`
+## Overview
 
-- Open [http://127.0.0.1:8080](http://127.0.0.1:8080) in your browser
+This project is a very simple web app for managing a list of books. There are 2 pages
 
-## Idea
+- http://app.localtest.me:8080/books \
+Shows a list of all the books in the system
 
-_Obviously we would need to create a new repo from this to remove the commit history and this description. I'm just hosting this here to get feedback for the time being_
+- http://app.localtest.me:8080/books/create \
+Allows a user to create a new book
 
----
+The books are retrieved and created via an API that at http://api.localtest.me:8080/. All the endpoints return a json
+body:
 
-The app that has been created is trying to mimic something similar everyday Valtari work. I would also like to incorporate an API component in someway as that is a large part of the dev role, but for now this is more focused on a Valtari type setup until I have any ideas (suggestions welcome).
+- `GET` http://api.localtest.me:8080/authors \
+Get a list of all the authors in the system
 
-I wanted to create this without a depedency on a fullstack framework as that would give a disadvantage to candidates who have not used that framework. I chose to use Slim for pretty much just routing, as I believe a senior developer should be able to pick up it's implementation quickly by skimming the code even if they've never used it specifically.
+- `GET` http://api.localtest.me:8080/books \
+Get a list of all books in the system
 
-Basically all requests are passed through `public/index.php` which requires composer's autoloader and a `app/routes.php` file. The routes file bootstraps Slim as a router (without DI) and defines 2 basic routes:
-- List books page
-- Create book page
+- `GET` http://api.localtest.me:8080/books/create \
+Create a new book. The follow query parameters can be sent:
+    - title  `string`
+    - author_id `integer`
+    - price[ZAR] `float`
 
-The routes call methods on the `BooksController`. As there is no DI by default I feel the code is very simple to grok and understand on first glance.
+## Basic Architecture
 
-My plan is to give the developer a few minutes to go through it with me, and ask what code smells and issues they see. I don't think we could takle everything in 45min - 1 hour so I will guide the process somewhat trying to addresses at least the following:
+This app consists of 2 separate codebases contained in 1 repo. The `/app` codebase handles the web frontend and the
+`/api` codebase handles for data retrieval and creation. Each codebase is entirely self contained and does not share
+code with the other. They can only communicate over http.
 
-- DI into controller for template engine and DB connection
-- Environment vars for the DB connection detials
-- Not passing the DB connection to the template in the BooksController::index() method, and getting the author data in the initial query
-- Not selecting * in all the queries
-- Output sanitation of variables in listing template
-- Change form action to POST when creating new book
-- Input sanitation in query to insert new book and price
-- Validation and error handling
-- Perhaps suggest bringing in an ORM to clean up the raw selects and inserts
-- Possibly suggest unquie key on (book_id, currency_id) in book_pricing table
+The entry point into each app is `/[app|api]/public/index.php`. All this file does is require the composer autoloader
+and a `/[app|api]/src/routes.php` file.
 
-The create screen currently only allows a ZAR price to be entered, although the db schema and seed data has multiple prices associated with each book. It would be good to chat through (and implement if time allows) adding the ability to capture all possible prices on creation.
-Another task could be to allow updating the create screen to allow editing existing books, and hadling the multiple currencies that way
-
-Another area I have seen developers struggle is SQL. The simple db schema allows me to ask them to write a few simple queries such as:
-- Find all books by author X
-- Find the number of books each author has that have a USD price
+The `routes.php` file boots up Slim Framework v3 and defines the routes for each codebase.
