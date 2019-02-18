@@ -7,14 +7,6 @@ $app = new \Slim\App([
     ],
 ]);
 
-// API specific routes
-$app->group('/api', function(\Slim\App $app) {
-    $app->get('/authors', '\Api\Authors\AuthorsController:index');
-
-    $app->get('/books', '\Api\Books\BooksController:index');
-    $app->get('/books/create', '\Api\Books\BooksController:create');
-});
-
 // Web app frontend routes
 $app->get('/books', '\App\Books\BooksController:index');
 $app->get('/books/create', '\App\Books\BooksController:create');

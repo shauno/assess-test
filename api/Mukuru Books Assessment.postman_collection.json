@@ -18,18 +18,16 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8080/api/books",
+							"raw": "http://api.localtest.me:8080/authors",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"api",
+								"localtest",
+								"me"
 							],
 							"port": "8080",
 							"path": [
-								"api",
-								"books"
+								"authors"
 							]
 						},
 						"description": "Return a list of all authors"
@@ -109,17 +107,15 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8080/api/books",
+							"raw": "http://api.localtest.me:8080/books",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"api",
+								"localtest",
+								"me"
 							],
 							"port": "8080",
 							"path": [
-								"api",
 								"books"
 							]
 						},
@@ -202,17 +198,15 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8080/api/books/create?title=Api Title Test&author_id=2&price[ZAR]=99.49",
+							"raw": "http://api.localtest.me:8080/books/create?title=Api Title Test&author_id=2&price[ZAR]=99.49",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"api",
+								"localtest",
+								"me"
 							],
 							"port": "8080",
 							"path": [
-								"api",
 								"books",
 								"create"
 							],

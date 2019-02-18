@@ -1,3 +1,4 @@
 FROM nginx:alpine
 
-ADD vhost.conf /etc/nginx/conf.d/default.conf
+ADD api.conf /etc/nginx/conf.d/api.conf
+ADD app.conf /etc/nginx/conf.d/app.conf

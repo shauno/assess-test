@@ -6,15 +6,25 @@ services:
       context: ./docker/nginx/
     working_dir: /var/www
     volumes:
-      - ./:/var/www
+      - ./api:/var/www/api
+      - ./app:/var/www/app
     ports:
       - 8080:80
-  app:
+    networks:
+      default:
+        aliases:
+          - api.localtest.me
+  api:
     build:
-      context: ./docker/app/
-    working_dir: /var/www
+      context: ./docker/api/
+    working_dir: /var/www/api
     volumes:
-      - ./:/var/www
+      - ./api:/var/www/api
+  app:
+    image: php:7-fpm-alpine
+    working_dir: /var/www/app
+    volumes:
+      - ./app:/var/www/app
   database:
     image: mysql:5.7
     volumes:
