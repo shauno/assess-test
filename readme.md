@@ -1,11 +1,9 @@
 ## Quickstart
 
-- Follow the instructions in the `./api/readme.md` and `./app/readme.md` to run service specific setup 
-
-From within this directory
-
-- Bring up the docker containers \
+- From within this directory, bring up the docker containers \
 `docker-compose up --build`
+
+- Follow the instructions in the `./api/readme.md` and `./app/readme.md` to run service specific setup like installing the dependencies and running the migrations 
 
 - Browse to http://app.localtest.me:8080/
 
