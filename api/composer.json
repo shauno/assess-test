@@ -1,6 +1,11 @@
 {
   "name": "mukuru/assessment-api",
   "type": "project",
+  "config": {
+    "platform": {
+      "php": "7.4"
+    }
+  },
   "autoload": {
     "psr-4": {
       "Api\\": "./src/"
