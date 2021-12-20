@@ -36,6 +36,7 @@ class CreateBooksTable extends AbstractMigration
             ->addColumn('author_id', 'integer')
             ->addForeignKey('author_id', 'authors', 'id')
             ->addColumn('title', 'string')
+            ->addColumn('description', 'string',['null' => true])
             ->create();
     }
 }
