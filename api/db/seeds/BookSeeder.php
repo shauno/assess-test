@@ -33,37 +33,26 @@ class BookSeeder extends AbstractSeed
                     [
                         'author_id' => $ernest['id'],
                         'title' => 'The old man and the sea',
-                        'description' => 'description test',
                     ],
                     [
                         'author_id' => $ernest['id'],
                         'title' => 'A Farewell to Arms',
-                        'description' => null,
-
                     ],
                     [
                         'author_id' => $jane['id'],
                         'title' => 'Pride and Prejudice',
-                        'description' => null,
-
                     ],
                     [
                         'author_id' => $jane['id'],
                         'title' => 'Sense and Sensibility',
-                        'description' => null,
-
                     ],
                     [
                         'author_id' => $mark['id'],
                         'title' => 'Roughing It',
-                        'description' => null,
-
                     ],
                     [
                         'author_id' => $mark['id'],
                         'title' => 'The Adventures of Tom Sawyer',
-                        'description' => null,
-
                     ],
                 ])
                 ->save();

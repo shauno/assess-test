@@ -4,21 +4,15 @@
  */
 ?>
 
-<table class="table">
+<table>
     <tr>
-        <th>Author</th>
         <th>Title</th>
-        <th>Description</th>
-        <th>Amounts</th>
-
+        <th>Author</th>
     </tr>
     <?php foreach ($books as $book): ?>
         <tr>
-            <td><?= $book->name ?> <?= $book->surname ?></td>
-            <td><?= $book->book_title ?></td>
-            <td><?= $book->book_description ?></td>
-            <td><?= $book->currency ?> <?= $book->amount ?></td>
-
+            <td><?= $book->title ?></td>
+            <td><?= $book->author->first_name ?> <?= $book->author->last_name ?></td>
         </tr>
     <?php endforeach; ?>
 </table>
