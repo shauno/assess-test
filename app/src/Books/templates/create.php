@@ -2,6 +2,10 @@
 /**
  * @var array $authors
  */
+
+/**
+ * @var array $bookPricingCurrencies
+ */
 ?>
 <form method="get" action="">
     <table>
@@ -22,8 +26,19 @@
         </tr>
 
         <tr>
-            <td>Price (ZAR)</td>
-            <td><input type="text" name="price[ZAR]" /></td>
+            <td>Price</td>
+            <td><input type="text" name="price" /></td>
+        </tr>
+
+        <tr>
+            <td>Currency</td>
+            <td>
+                <select name="currency">
+                    <?php foreach ($bookPricingCurrencies as $bookPricingCurrency): ?>
+                        <option value="<?= $bookPricingCurrency->id ?>"><?= $bookPricingCurrency->iso ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </td>
         </tr>
 
         <tr>

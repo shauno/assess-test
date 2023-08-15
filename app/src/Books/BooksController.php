@@ -11,6 +11,7 @@ class BooksController
     public function index(Request $request, Response $response)
     {
         // Get all the books to show
+        // @TODO we can look at configuring this endpoint in the .env file, to make it dynamic for various environments
         $ch = curl_init('http://api.localtest.me/books');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $books = json_decode(curl_exec($ch));
@@ -48,6 +49,8 @@ class BooksController
             curl_exec($ch);
             curl_close($ch);
 
+            var_dump($params);
+            die();
             // Redirect back to book listing
             return $response->withStatus(302)->withHeader('Location', '/books');
         }
@@ -58,10 +61,18 @@ class BooksController
         $authors = json_decode(curl_exec($ch));
         curl_close($ch);
 
+        // Get all the book pricings
+        $ch = curl_init('http://api.localtest.me/book_pricing_currencies');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $pricingCurrencies = json_decode(curl_exec($ch));
+        curl_close($ch);
+
+
         $renderer = new PhpRenderer('../src/Books/templates/');
 
         return $renderer->render($response, 'create.php', [
             'authors' => $authors,
+            'bookPricingCurrencies' => $pricingCurrencies,
         ]);
     }
 }

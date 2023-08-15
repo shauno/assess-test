@@ -9,6 +9,7 @@ class AuthorsController
 {
     public function index(Request $request, Response $response)
     {
+        // @TODO configure DB connection , remove from controller function
         $db = new \PDO('mysql:host=database;dbname=assess_db', 'root', 'secret');
         $db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 
