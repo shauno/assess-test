@@ -1,6 +1,7 @@
 <?php
 /**
  * @var array $authors
+ * @var array $currencies
  */
 ?>
 <form method="get" action="">
@@ -23,8 +24,19 @@
 
         <tr>
             <td>Price (ZAR)</td>
-            <td><input type="text" name="price[ZAR]" /></td>
+            <td>
+                <select name="currency">
+                    <?php foreach ($currencies as $currency): ?>
+                        <option value="<?= $currency->id ?>"><?= $currency->name ?> </option>
+                    <?php endforeach; ?>
+                </select>
+            </td>
         </tr>
+        <tr>
+            <td>Amount</td>
+            <td><input type="number" name="price" /> </td>
+        </tr>
+
 
         <tr>
             <td colspan="2" align="right">
