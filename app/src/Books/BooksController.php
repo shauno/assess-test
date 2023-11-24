@@ -38,8 +38,18 @@ class BooksController
         ]);
     }
 
+    //function comment
     public function create(Request $request, Response $response)
     {
+
+
+        // Get all the currencies
+        $ch = curl_init('http://api.localtest.me/books/pricing');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $currencies = json_decode(curl_exec($ch));
+        curl_close($ch);
+
+
         // Check if form data has been sent
         if ($params = $request->getQueryParams()) {
             // Make the api call to create the book
@@ -61,6 +71,7 @@ class BooksController
         $renderer = new PhpRenderer('../src/Books/templates/');
 
         return $renderer->render($response, 'create.php', [
+            'currencies' => $currencies,
             'authors' => $authors,
         ]);
     }
