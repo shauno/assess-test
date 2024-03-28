@@ -40,6 +40,7 @@ class BooksController
 
     public function create(Request $request, Response $response)
     {
+        
         // Check if form data has been sent
         if ($params = $request->getQueryParams()) {
             // Make the api call to create the book
@@ -57,11 +58,19 @@ class BooksController
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $authors = json_decode(curl_exec($ch));
         curl_close($ch);
+        
+
+        // Get all the books to show
+        $ch = curl_init('http://api.localtest.me/books/getCurrency');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $currencies = json_decode(curl_exec($ch));
+        curl_close($ch);
 
         $renderer = new PhpRenderer('../src/Books/templates/');
 
         return $renderer->render($response, 'create.php', [
             'authors' => $authors,
+            'currencies' => $currencies,
         ]);
     }
 }

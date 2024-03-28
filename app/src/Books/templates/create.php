@@ -23,7 +23,14 @@
 
         <tr>
             <td>Price (ZAR)</td>
-            <td><input type="text" name="price[ZAR]" /></td>
+            <td>
+                <select name="currency_id">
+                    <?php foreach ($currencies as $currency): ?>
+                        <option value="<?= $currency->iso ?>"><?= $currency->iso ?> <?= $currency->name ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </td>
+            <td><input type="text" name="price" /></td>
         </tr>
 
         <tr>

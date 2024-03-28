@@ -9,7 +9,8 @@ $app = new \Slim\App([
 
 $app->get('/authors', '\Api\Authors\AuthorsController:index');
 
-$app->get('/books', '\Api\Books\BooksController:index');
+$app->get('/books/', '\Api\Books\BooksController:index');
 $app->get('/books/create', '\Api\Books\BooksController:create');
+$app->get('/books/getCurrency', '\Api\Books\CurrencyController:getCurrency');
 
 $app->run();
