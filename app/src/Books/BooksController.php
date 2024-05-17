@@ -5,37 +5,79 @@ namespace App\Books;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use \Slim\Views\PhpRenderer;
+use GuzzleHttp\Client;
+use Respect\Validation\Validator as v;
+use Symfony\Component\Yaml\Dumper;
 
 class BooksController
 {
     public function index(Request $request, Response $response)
     {
-        // Get all the books to show
-        $ch = curl_init('http://api.localtest.me/books');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $books = json_decode(curl_exec($ch));
-        curl_close($ch);
+        $httpClient = new Client();
 
+        // Retrieve all books
+        $booksResponse = $httpClient->get('http://api.localtest.me/books');
+        $booksData = json_decode($booksResponse->getBody());
 
-        // Get all the authors
-        $ch = curl_init('http://api.localtest.me/authors');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $authors = json_decode(curl_exec($ch));
-        curl_close($ch);
+        // Retrieve all authors
+        $authorsResponse = $httpClient->get('http://api.localtest.me/authors');
+        $authorsData = json_decode($authorsResponse->getBody());
 
-        // Loop through all books and add the author to each one for use in the listing template
-        foreach ($books as $key => $book) {
-            foreach ($authors as $author) {
+        // Retrieve all authors
+        $pricingResponse = $httpClient->get('http://api.localtest.me/pricing');
+        $pricingCurrencyData = json_decode($pricingResponse->getBody());
+
+        $currencyResponse = $httpClient->get('http://api.localtest.me/currency');
+        $currencyData = json_decode($currencyResponse->getBody());
+
+        // Associate each book with its corresponding author
+        foreach ($booksData as $bookKey => $book) {
+            foreach ($authorsData as $author) {
                 if ($book->author_id == $author->id) {
-                    $books[$key]->author = $author;
+                    $booksData[$bookKey]->author = $author;
+                    break;
                 }
             }
         }
 
+        // Associate each book with its corresponding author
+        foreach ($pricingCurrencyData->pricing as $key => $price) {
+            foreach ($pricingCurrencyData->currencies as $currency) {
+                if ($price->currency_id == $currency->id) {
+                    $pricingCurrencyData->pricing[$key]->currency = $currency;
+                    break;
+                }
+            }
+        }
+
+        // // // $priceCurrencyObject = $pricingCurrencyData->pricing;
+
+        // Associate each book with its corresponding author
+        foreach ($booksData as $bookKey => $book) {
+            foreach ($book->pricing as $pricing) {
+                foreach ($currencyData as $currency)
+                if ($pricing->currency_id == $currency->id) {
+                    $booksData[$bookKey]->currency = $currency;
+                    break;
+                }
+            }
+        
+            foreach ($pricingCurrencyData->pricing as $priceCurrency) {
+                if ($book->id == $priceCurrency->book_id) {
+                    $booksData[$bookKey]->pricing = $priceCurrency;
+                    break;
+                }
+            }
+
+        }
+
+        // Render the list of books
         $renderer = new PhpRenderer('../src/Books/templates/');
         return $renderer->render($response, 'list.php', [
-            'books' => $books,
+            'books' => $booksData,
+            'pricing' => $pricingCurrencyData,
         ]);
+
     }
 
     public function create(Request $request, Response $response)
@@ -58,10 +100,17 @@ class BooksController
         $authors = json_decode(curl_exec($ch));
         curl_close($ch);
 
+        // Get all the authors
+        $ch = curl_init('http://api.localtest.me/currency');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $currency = json_decode(curl_exec($ch));
+        curl_close($ch);
+
         $renderer = new PhpRenderer('../src/Books/templates/');
 
         return $renderer->render($response, 'create.php', [
             'authors' => $authors,
+            'currency' => $currency,
         ]);
     }
 }

@@ -15,6 +15,7 @@
     "ext-pdo": "*",
     "ext-json": "*",
     "slim/slim": "^3.12",
-    "robmorgan/phinx": "^0.10.6"
+    "robmorgan/phinx": "^0.10.6",
+    "guzzlehttp/guzzle": "^7.8"
   }
 }
