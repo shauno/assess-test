@@ -4,16 +4,22 @@ namespace Api\Authors;
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
+use Api\Database\Database;
 
 class AuthorsController
 {
+    private $db;
+
+    public function __construct()
+    {
+        $this->db = Database::getConnection();
+    }
+
     public function index(Request $request, Response $response)
     {
-        $db = new \PDO('mysql:host=database;dbname=assess_db', 'root', 'secret');
-        $db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
-
-        $authors = $db->query('SELECT * FROM authors')
-            ->fetchAll();
+        $stmt = $this->db->prepare('SELECT * FROM authors');
+        $stmt->execute();
+        $authors = $stmt->fetchAll();
 
         return $response->getBody()->write(json_encode($authors));
     }

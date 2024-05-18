@@ -6,111 +6,171 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use \Slim\Views\PhpRenderer;
 use GuzzleHttp\Client;
+use Psr\Http\Message\ResponseInterface;
 use Respect\Validation\Validator as v;
-use Symfony\Component\Yaml\Dumper;
 
 class BooksController
 {
-    public function index(Request $request, Response $response)
+    private $client;
+
+    public function __construct()
     {
-        $httpClient = new Client();
-
-        // Retrieve all books
-        $booksResponse = $httpClient->get('http://api.localtest.me/books');
-        $booksData = json_decode($booksResponse->getBody());
-
-        // Retrieve all authors
-        $authorsResponse = $httpClient->get('http://api.localtest.me/authors');
-        $authorsData = json_decode($authorsResponse->getBody());
-
-        // Retrieve all authors
-        $pricingResponse = $httpClient->get('http://api.localtest.me/pricing');
-        $pricingCurrencyData = json_decode($pricingResponse->getBody());
-
-        $currencyResponse = $httpClient->get('http://api.localtest.me/currency');
-        $currencyData = json_decode($currencyResponse->getBody());
-
-        // Associate each book with its corresponding author
-        foreach ($booksData as $bookKey => $book) {
-            foreach ($authorsData as $author) {
-                if ($book->author_id == $author->id) {
-                    $booksData[$bookKey]->author = $author;
-                    break;
-                }
-            }
-        }
-
-        // Associate each book with its corresponding author
-        foreach ($pricingCurrencyData->pricing as $key => $price) {
-            foreach ($pricingCurrencyData->currencies as $currency) {
-                if ($price->currency_id == $currency->id) {
-                    $pricingCurrencyData->pricing[$key]->currency = $currency;
-                    break;
-                }
-            }
-        }
-
-        // // // $priceCurrencyObject = $pricingCurrencyData->pricing;
-
-        // Associate each book with its corresponding author
-        foreach ($booksData as $bookKey => $book) {
-            foreach ($book->pricing as $pricing) {
-                foreach ($currencyData as $currency)
-                if ($pricing->currency_id == $currency->id) {
-                    $booksData[$bookKey]->currency = $currency;
-                    break;
-                }
-            }
-        
-            foreach ($pricingCurrencyData->pricing as $priceCurrency) {
-                if ($book->id == $priceCurrency->book_id) {
-                    $booksData[$bookKey]->pricing = $priceCurrency;
-                    break;
-                }
-            }
-
-        }
-
-        // Render the list of books
-        $renderer = new PhpRenderer('../src/Books/templates/');
-        return $renderer->render($response, 'list.php', [
-            'books' => $booksData,
-            'pricing' => $pricingCurrencyData,
-        ]);
-
+        $this->client = new Client();
     }
 
+    public function index(Request $request, Response $response)
+    {
+    
+        // Get all the books
+        $books = $this->getBooks($this->client);
+
+        // Get all the authors
+        $authors = $this->getAuthors($this->client);
+        
+        // Get all the book_pricing
+        $books_pricing = $this->getAllBookPricing();
+
+        // Loop through all books and add the pricing to each one for use in the listing template
+        foreach ($books as $key => $book) {
+            foreach ($books_pricing as $price) {
+                if ($price->book_id == $book->id) {
+                    $books[$key]->pricing = $price;
+                }
+            }
+        }
+
+        // Get all the currencies
+        $currencies = $this->getAllCurrencies();
+
+        // $mergedArray = $this->mergeArrays($books_pricing, $books);
+
+        // foreach ($books as $key => $book) {
+        //     foreach ($books_pricing as $price) {
+        //         if ($book->id == $price->book_id) {
+        //             $books[$key]->price = $price->price;
+        //         }
+        //     }
+        // }
+
+        // foreach ($books_pricing as $key => $book_price) {
+        //     foreach ($currencies as $currency) {
+        //         if ($currency->id == $books_pricing->currency_id) {
+        //             $books_pricing[$key]->price = $books_pricing->price;
+        //         }
+        //     }
+        // }
+        
+        $renderer = new PhpRenderer('../src/Books/templates/');
+        return $renderer->render($response, 'list.php', [
+            'books' => $books,
+            'books_pricing' => $books_pricing,
+        ]);
+    }
+   
     public function create(Request $request, Response $response)
     {
         // Check if form data has been sent
-        if ($params = $request->getQueryParams()) {
-            // Make the api call to create the book
-            $ch = curl_init('http://api.localtest.me/books/create?'.http_build_query($params));
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_exec($ch);
-            curl_close($ch);
+        $params = $request->getQueryParams();
 
-            // Redirect back to book listing
-            return $response->withStatus(302)->withHeader('Location', '/books');
+        if (!empty($params)) {
+            // Make the API call to create the book
+            $response = $this->client->request('GET', 'http://api.localtest.me/books/create', [
+                'query' => $params,
+            ]);
+
+            // Check the status code to ensure the request was successful
+            if ($response->getStatusCode() === 200) {
+                // Redirect back to book listing
+                return $response->withStatus(302)->withHeader('Location', '/books');
+            } else {
+                // Handle unsuccessful API call
+                // For example, return an error response
+                return $response->withStatus(500)->getBody()->write('Failed to create book.');
+            }
         }
 
-        // Get all the authors
-        $ch = curl_init('http://api.localtest.me/authors');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $authors = json_decode(curl_exec($ch));
-        curl_close($ch);
 
         // Get all the authors
-        $ch = curl_init('http://api.localtest.me/currency');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $currency = json_decode(curl_exec($ch));
-        curl_close($ch);
+        $authors = $this->getAllAuthors();
+
+        // Get all the currencies
+        $currencies = $this->getAllCurrencies();
+
+        // Get all the book_pricing
+        $book_pricing = $this->getAllBookPricing();
 
         $renderer = new PhpRenderer('../src/Books/templates/');
 
         return $renderer->render($response, 'create.php', [
             'authors' => $authors,
-            'currency' => $currency,
+            'currencies' => $currencies,
+            'book_pricing' => $book_pricing,
         ]);
+    }
+
+    private function getBooks()
+    {
+        $response = $this->client->get('http://api.localtest.me/books');
+        return json_decode($response->getBody()->getContents());
+    }
+    
+    private function getAuthors()
+    {
+        $response = $this->client->get('http://api.localtest.me/authors');
+        return json_decode($response->getBody()->getContents());
+    }
+
+    private function getAllAuthors()
+    {
+        
+        $response = $this->client->get('http://api.localtest.me/authors');
+
+        if ($response->getStatusCode() === 200) {
+            return json_decode($response->getBody()->getContents());
+        }
+
+        return null;
+    }
+
+    private function getAllCurrencies()
+    {
+        $response = $this->client->get('http://api.localtest.me/currencies');
+    
+        if ($response->getStatusCode() === 200) {
+            return json_decode($response->getBody()->getContents());
+        }
+    
+        return null;
+    }
+    
+    private function getAllBookPricing()
+    {
+        $response = $this->client->get('http://api.localtest.me/book_pricing');
+    
+        if ($response->getStatusCode() === 200) {
+            return json_decode($response->getBody()->getContents());
+        }
+    
+        return null;
+    }   
+    
+    private function mergeBooksAndPricing($booksObject, $booksPrice) {
+        // Create a mapping of books by their id
+        $bookMap = [];
+        foreach ($booksPrice as $book) {
+            $bookMap[$book['id']] = $book;
+        }
+    
+        // Merge arrays
+        $mergedArray = [];
+        foreach ($booksObject as $pricing) {
+            $bookId = $pricing['book_id'];
+            if (isset($bookMap[$bookId])) {
+                $mergedEntry = array_merge($pricing, $bookMap[$bookId]);
+                $mergedArray[] = $mergedEntry;
+            }
+        }
+    
+        return $mergedArray;
     }
 }

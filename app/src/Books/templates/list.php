@@ -2,9 +2,8 @@
 /**
  * @var array $books
  */
-
- print_r(json_encode($books));
 ?>
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -21,7 +20,6 @@
     <div class="content">
       <div class="container">
 
-      
         <div class="table-responsive">
           <table class="table table-striped_ custom-table"><tr>
                 <th scope="col"><h2 class="mb-5" >Books Listing</h2></th>
@@ -37,7 +35,6 @@
           <table class="table table-striped custom-table">
             <thead>
               <tr>
-                <th scope="col">ID</th>
                 <th scope="col">Title & Author</th>
                 <th scope="col">Currency</th>
                 <th scope="col">Price</th>
@@ -47,10 +44,9 @@
             <tbody>
               <?php foreach ($books as $book): ?>
                   <tr>
-                      <td><?= $book->id ?></td>
-                      <td> <?= $book->title ?> <small class="d-block"> <?= $book->author->first_name ?> <?= $book->author->last_name ?> </small></td>
-                      <td><?= $book->pricing->currency->name ?></td>
-                      <td><?= $book->pricing->currency->iso ?> <?= $book->pricing->price ?></td>
+                      <td> <?= $book->title ?> <small class="d-block"> <?= $book->first_name ?> <?= $book->last_name ?> </small></td>
+                      <td><?= $book->pricing->name ?></td>
+                      <td><?= $book->pricing->iso ?> <?= $book->pricing->price ?></td>
                       <td><a href="#" class="more">Details</a></td>
                   </tr>
               <?php endforeach; ?>

@@ -45,17 +45,17 @@
 
             <div class="form-group row">
                 <div class="col-sm-10  offset-sm-2">
-                    <select id="currency" name="currency_symbol" class="form-control" required>
+                
+                    <select id="currency" name="currency_id" class="form-control" required>
                     <option>Please Select Currency</option>
-                        <?php foreach ($currency as $cur): ?>
-                            <option value="<?= $cur->iso ?>"><?= $cur->name ?></option>
-                        <?php endforeach; ?>
+                    <?php foreach ($currencies as $currency): ?>
+                        <option value="<?= $currency->id ?>"><?= $currency->iso ?> </option>
+                    <?php endforeach; ?>
                     </select>
                 </div>
             </div>
 
             <div class="form-group row">
-                <!-- <label for="price" class="col-sm-2 col-form-label">Price</label> -->
                 <div class="col-sm-10  offset-sm-2">
                     <input type="text" id="price" name="price" class="form-control" placeholder="Price" required>
                 </div>
@@ -76,3 +76,4 @@
     <script src="assets/js/main.js"></script>
   </body>
 </html>
+
